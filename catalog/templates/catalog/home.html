@@ -1,0 +1,303 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Catálogo de Jutsus de Naruto{% endblock %}
+
+{% block extra_css %}
+<style>
+    .hero-section {
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                    url('https://raw.githubusercontent.com/Augusto240/naruto-assets/main/hero-bg.jpg');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        padding: 5rem 0;
+        margin-bottom: 3rem;
+        border-radius: 12px;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .hero-content {
+        position: relative;
+        z-index: 2;
+    }
+    
+    .hero-section h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .hero-section p {
+        font-size: 1.1rem;
+        max-width: 700px;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+    }
+    
+    .hero-buttons .btn {
+        padding: 0.75rem 1.5rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .section-title {
+        position: relative;
+        margin-bottom: 2rem;
+        padding-bottom: 0.5rem;
+    }
+    
+    .section-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100px;
+        height: 3px;
+        background: var(--naruto-orange);
+        border-radius: 3px;
+    }
+    
+    .category-title {
+        margin-bottom: 1.5rem;
+        position: relative;
+        display: inline-block;
+        padding-bottom: 5px;
+    }
+    
+    .category-title::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 40px;
+        height: 3px;
+        background: var(--naruto-orange);
+        border-radius: 3px;
+    }
+    
+    .featured-card {
+        transition: all 0.3s ease;
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        height: 100%;
+    }
+    
+    .featured-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+    }
+    
+    .stats-section {
+        background-color: var(--naruto-blue);
+        color: white;
+        padding: 3rem 0;
+        margin: 3rem 0;
+        border-radius: 12px;
+    }
+    
+    .stat-item {
+        text-align: center;
+    }
+    
+    .stat-item .number {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        display: block;
+        color: var(--naruto-yellow);
+    }
+    
+    .stat-item .label {
+        font-size: 1rem;
+        opacity: 0.9;
+    }
+    
+    .element-section {
+        margin-bottom: 3rem;
+    }
+    
+    .element-icon {
+        font-size: 2rem;
+        margin-right: 0.5rem;
+    }
+    
+    .about-section {
+        background-color: #f8f9fa;
+        padding: 3rem;
+        border-radius: 12px;
+        margin-bottom: 3rem;
+    }
+    
+    .about-section h2 {
+        margin-bottom: 1.5rem;
+    }
+    
+    .about-section p {
+        margin-bottom: 1rem;
+        font-size: 1.05rem;
+        line-height: 1.6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container hero-content">
+        <div class="row">
+            <div class="col-lg-8">
+                <h1>Descubra os Segredos dos Jutsus</h1>
+                <p>Explore o catálogo completo de técnicas do universo Naruto. Desde jutsus básicos até técnicas lendárias, encontre informações detalhadas sobre cada jutsu.</p>
+                <div class="hero-buttons">
+                    <a href="{% url 'jutsu-list' %}" class="btn btn-primary me-2">Explorar Catálogo</a>
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-light">Ver Estatísticas</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Latest Jutsus Section -->
+<section class="mb-5">
+    <h2 class="section-title">Jutsus Recentes</h2>
+    <div class="row">
+        {% for jutsu in latest_jutsus %}
+            <div class="col-md-4 mb-4">
+                <div class="card featured-card" data-element="{{ jutsu.element_type }}">
+                    <div class="card-body">
+                        <span class="element-badge {{ jutsu.element_type }}">{{ jutsu.get_element_type_display }}</span>
+                        <span class="rank-badge rank-{{ jutsu.rank|lower }}">{{ jutsu.rank }}</span>
+                        <h5 class="card-title mt-2">{{ jutsu.name }}</h5>
+                        <p class="card-text">{{ jutsu.description|truncatewords:20 }}</p>
+                        <a href="{% url 'jutsu-detail' jutsu.pk %}" class="btn btn-primary btn-sm">Ver Detalhes</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col">
+                <p class="alert alert-info">Nenhum jutsu cadastrado ainda.</p>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="stats-section">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4 mb-md-0">
+                <div class="stat-item">
+                    <span class="number">{{ total_jutsus }}</span>
+                    <span class="label">Jutsus Catalogados</span>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4 mb-md-0">
+                <div class="stat-item">
+                    <span class="number">5</span>
+                    <span class="label">Elementos Principais</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="stat-item">
+                    <span class="number">4</span>
+                    <span class="label">Tipos de Jutsus</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Fire Jutsus Section -->
+<section class="element-section">
+    <h3 class="category-title">
+        <i class="fas fa-fire element-icon" style="color: #FF4500;"></i> Jutsus de Fogo
+    </h3>
+    <div class="row">
+        {% for jutsu in fire_jutsus %}
+            <div class="col-md-6 mb-4">
+                <div class="card featured-card element-fire">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ jutsu.name }}</h5>
+                        <p class="card-text">{{ jutsu.description|truncatewords:15 }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="rank-badge rank-{{ jutsu.rank|lower }}">{{ jutsu.rank }}</span>
+                            <a href="{% url 'jutsu-detail' jutsu.pk %}" class="btn btn-primary btn-sm">Ver Detalhes</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col">
+                <p class="alert alert-info">Nenhum jutsu de fogo cadastrado ainda.</p>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- Water Jutsus Section -->
+<section class="element-section">
+    <h3 class="category-title">
+        <i class="fas fa-water element-icon" style="color: #1E90FF;"></i> Jutsus de Água
+    </h3>
+    <div class="row">
+        {% for jutsu in water_jutsus %}
+            <div class="col-md-6 mb-4">
+                <div class="card featured-card element-water">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ jutsu.name }}</h5>
+                        <p class="card-text">{{ jutsu.description|truncatewords:15 }}</p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="rank-badge rank-{{ jutsu.rank|lower }}">{{ jutsu.rank }}</span>
+                            <a href="{% url 'jutsu-detail' jutsu.pk %}" class="btn btn-primary btn-sm">Ver Detalhes</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col">
+                <p class="alert alert-info">Nenhum jutsu de água cadastrado ainda.</p>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="about-section">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <h2>Sobre o Projeto</h2>
+            <p>O <strong>Naruto Jutsu Catalog</strong> é um projeto desenvolvido como parte do meu portfólio, demonstrando habilidades em desenvolvimento web com Django e Python.</p>
+            <p>Este catálogo permite explorar os diversos jutsus do universo Naruto, oferecendo detalhes sobre cada técnica, incluindo seu elemento, tipo, rank e descrição completa.</p>
+            <p>O projeto implementa um CRUD completo, permitindo adicionar, visualizar, editar e excluir jutsus, além de oferecer uma API REST para integração com outros sistemas.</p>
+            <p>Sinta-se à vontade para explorar o catálogo e descobrir mais sobre as técnicas ninjas!</p>
+        </div>
+    </div>
+</section>
+
+<!-- High Rank Jutsus Section -->
+<section>
+    <h2 class="section-title">Jutsus Poderosos</h2>
+    <div class="row">
+        {% for jutsu in high_rank_jutsus %}
+            <div class="col-md-4 mb-4">
+                <div class="card featured-card" data-element="{{ jutsu.element_type }}">
+                    <div class="card-body">
+                        <span class="element-badge {{ jutsu.element_type }}">{{ jutsu.get_element_type_display }}</span>
+                        <span class="rank-badge rank-{{ jutsu.rank|lower }}">{{ jutsu.rank }}</span>
+                        <h5 class="card-title mt-2">{{ jutsu.name }}</h5>
+                        <p class="card-text">{{ jutsu.description|truncatewords:20 }}</p>
+                        <a href="{% url 'jutsu-detail' jutsu.pk %}" class="btn btn-primary btn-sm">Ver Detalhes</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col">
+                <p class="alert alert-info">Nenhum jutsu de alto rank cadastrado ainda.</p>
+            </div>
+        {% endfor %}
+    </div>
+</section>
+{% endblock %}

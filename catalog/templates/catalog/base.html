@@ -4,82 +4,432 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>{% block title %}Catálogo de Jutsus{% endblock %}</title>
+    <title>{% block title %}Catálogo de Jutsus de Naruto{% endblock %}</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" href="https://mir-s3-cdn-cf.behance.net/project_modules/1400/8987bd130641623.6184473f5678a.png" type="image/png">
     
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome para ícones -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* Personalização com tema Naruto */
+        /* Tema Naruto aprimorado */
         :root {
-            --naruto-orange: #FFA500;
-            --naruto-blue: #0E73B7;
+            --naruto-orange: #FF9800;
+            --naruto-blue: #005A9C;
+            --naruto-red: #C30101;
             --naruto-black: #1A1A1A;
+            --naruto-yellow: #FFD700;
+            --naruto-sage: #ACBD86;
+            --naruto-gray: #404040;
         }
         
         body { 
             display: flex; 
             flex-direction: column; 
             min-height: 100vh;
-            background-color: #f8f9fa;
+            background-color: #ecc496;
+            background-repeat: repeat;
+            font-family: 'Poppins', sans-serif;
         }
         
-        main { flex: 1; }
+        main { 
+            flex: 1;
+            padding-bottom: 2rem;
+        }
         
         .navbar {
-            background-color: var(--naruto-orange) !important;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, var(--naruto-orange) 0%, var(--naruto-red) 100%);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            padding: 0.8rem 1rem;
         }
         
         .navbar-brand {
-            font-weight: bold;
-            color: var(--naruto-black) !important;
+            font-weight: 700;
+            color: white !important;
+            font-family: 'Noto Sans JP', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .navbar-brand img {
+            height: 35px;
+            margin-right: 10px;
         }
         
         .nav-link {
-            color: var(--naruto-black) !important;
+            color: white !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+            border-radius: 5px;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+        
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            border-radius: 8px;
+        }
+        
+        .dropdown-item {
+            padding: 0.5rem 1.5rem;
+            transition: all 0.2s ease;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f1f1f1;
+            padding-left: 1.7rem;
         }
         
         .btn-primary {
             background-color: var(--naruto-blue);
             border-color: var(--naruto-blue);
+            box-shadow: 0 4px 6px rgba(0, 90, 156, 0.2);
+            transition: all 0.3s ease;
         }
         
         .btn-primary:hover {
-            background-color: #0d5d92;
-            border-color: #0d5d92;
+            background-color: #004a80;
+            border-color: #004a80;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 90, 156, 0.3);
+        }
+        
+        .btn-success {
+            background-color: #2e7d32;
+            border-color: #2e7d32;
+            box-shadow: 0 4px 6px rgba(46, 125, 50, 0.2);
+        }
+        
+        .btn-success:hover {
+            background-color: #246128;
+            border-color: #246128;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(46, 125, 50, 0.3);
+        }
+        
+        .btn-danger {
+            background-color: var(--naruto-red);
+            border-color: var(--naruto-red);
+            box-shadow: 0 4px 6px rgba(195, 1, 1, 0.2);
+        }
+        
+        .btn-danger:hover {
+            background-color: #a10000;
+            border-color: #a10000;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(195, 1, 1, 0.3);
         }
         
         .card {
-            transition: transform 0.3s;
-            border-radius: 8px;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            overflow: hidden;
         }
         
         .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
         }
         
-        .jutsu-element-icon {
-            font-size: 1.5rem;
+        .card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            font-weight: 600;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        /* Cores por elemento para os cards */
+        .card.element-fire {
+            border-top: 4px solid #FF4500;
+        }
+        
+        .card.element-water {
+            border-top: 4px solid #1E90FF;
+        }
+        
+        .card.element-wind {
+            border-top: 4px solid #98FB98;
+        }
+        
+        .card.element-earth {
+            border-top: 4px solid #8B4513;
+        }
+        
+        .card.element-lightning {
+            border-top: 4px solid #FFD700;
+        }
+        
+        .card.element-illusion {
+            border-top: 4px solid #9370DB;
+        }
+        
+        .element-badge {
+            display: inline-block;
+            padding: 0.35em 0.65em;
+            font-size: 0.75em;
+            font-weight: 600;
+            line-height: 1;
+            color: #fff;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+            border-radius: 50rem;
             margin-right: 0.5rem;
         }
         
-        footer {
-            background-color: var(--naruto-black);
+        .element-badge.fire { background-color: #FF4500; }
+        .element-badge.water { background-color: #1E90FF; }
+        .element-badge.wind { background-color: #98FB98; color: #333; }
+        .element-badge.earth { background-color: #8B4513; }
+        .element-badge.lightning { background-color: #FFD700; color: #333; }
+        .element-badge.illusion { background-color: #9370DB; }
+        .element-badge.other { background-color: #A9A9A9; }
+        
+        .rank-badge {
+            font-weight: bold;
+            border-radius: 50%;
+            width: 28px;
+            height: 28px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             color: white;
-            padding: 1.5rem 0;
+            font-size: 0.8rem;
+        }
+        
+        .rank-badge.rank-e { background-color: #C0C0C0; }
+        .rank-badge.rank-d { background-color: #CD7F32; }
+        .rank-badge.rank-c { background-color: #00BFFF; }
+        .rank-badge.rank-b { background-color: #32CD32; }
+        .rank-badge.rank-a { background-color: #FF4500; }
+        .rank-badge.rank-s { background-color: #9400D3; }
+        .rank-badge.rank-ss { background-color: #8B0000; }
+        
+        /* Paginação estilizada */
+        .pagination .page-link {
+            color: var(--naruto-blue);
+            background-color: white;
+            border-color: #dee2e6;
+            box-shadow: none;
+            transition: all 0.2s ease;
+        }
+        
+        .pagination .page-link:hover {
+            z-index: 2;
+            color: #004a80;
+            background-color: #e9ecef;
+            border-color: #dee2e6;
+        }
+        
+        .pagination .page-item.active .page-link {
+            z-index: 3;
+            color: #fff;
+            background-color: var(--naruto-orange);
+            border-color: var(--naruto-orange);
+        }
+        
+        /* Footer estilizado */
+        footer {
+            background: linear-gradient(135deg, var(--naruto-black) 0%, var(--naruto-gray) 100%);
+            color: white;
+            padding: 2rem 0;
+            position: relative;
+        }
+        
+        footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--naruto-orange), var(--naruto-red), var(--naruto-blue));
+        }
+        
+        footer h5 {
+            font-weight: 600;
+            margin-bottom: 1.2rem;
+            color: var(--naruto-orange);
+        }
+        
+        footer a {
+            color: #e0e0e0;
+            transition: color 0.2s ease;
+            text-decoration: none;
+        }
+        
+        footer a:hover {
+            color: var(--naruto-yellow);
+        }
+        
+        /* Estilos para dispositivos móveis */
+        @media (max-width: 768px) {
+            .navbar-brand {
+                font-size: 1.1rem;
+            }
+            
+            .navbar-brand img {
+                height: 30px;
+            }
+            
+            .btn {
+                font-size: 0.9rem;
+                padding: 0.375rem 0.75rem;
+            }
+            
+            main {
+                padding-bottom: 1rem;
+            }
+        }
+        
+        /* Adicionar sombra à navegação quando rolar a página */
+        .navbar-scrolled {
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
+        
+        /* Animação para os cartões */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .animated-card {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
+        
+        /* Estilo para as mensagens */
+        .alert {
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+        
+        /* Estilo para a barra de pesquisa */
+        .search-form {
+            background-color: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+        
+        .search-form .form-control {
+            border-radius: 6px;
+            padding: 0.6rem 1rem;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        
+        .search-form .form-control:focus {
+            border-color: var(--naruto-orange);
+            box-shadow: 0 0 0 0.25rem rgba(255, 152, 0, 0.25);
+        }
+        
+        .search-form .form-select {
+            border-radius: 6px;
+            padding: 0.6rem 1rem;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+        }
+        
+        .search-form .form-select:focus {
+            border-color: var(--naruto-orange);
+            box-shadow: 0 0 0 0.25rem rgba(255, 152, 0, 0.25);
+        }
+        
+        /* Scroll to top button */
+        .scroll-to-top {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--naruto-orange);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .scroll-to-top.visible {
+            opacity: 1;
+        }
+        
+        .scroll-to-top:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+        
+        /* Estilos para o modo escuro */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background-color: #121212;
+                color: #e0e0e0;
+            }
+            
+            .card {
+                background-color: #1e1e1e;
+                color: #e0e0e0;
+            }
+            
+            .card-header {
+                background-color: #2a2a2a;
+                color: #e0e0e0;
+            }
+            
+            .search-form {
+                background-color: #1e1e1e;
+            }
+            
+            .search-form .form-control,
+            .search-form .form-select {
+                background-color: #2a2a2a;
+                border-color: #444;
+                color: #e0e0e0;
+            }
+            
+            .dropdown-menu {
+                background-color: #2a2a2a;
+            }
+            
+            .dropdown-item {
+                color: #e0e0e0;
+            }
+            
+            .dropdown-item:hover {
+                background-color: #3a3a3a;
+            }
         }
     </style>
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
-
-    <nav class="navbar navbar-expand-lg navbar-light mb-4 shadow-sm">
+    <!-- Barra de navegação principal -->
+    <nav class="navbar navbar-expand-lg navbar-dark mb-4">
         <div class="container">
-            <a class="navbar-brand" href="{% url 'jutsu-list' %}">
-                <i class="fas fa-scroll me-2"></i> Catálogo de Jutsus
+            <a class="navbar-brand" href="{% url 'home' %}">
+                <img src="https://mir-s3-cdn-cf.behance.net/project_modules/1400/8987bd130641623.6184473f5678a.png" alt="Logo">
+                Catálogo de Jutsus
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -93,7 +443,7 @@
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-fire me-1"></i> Filtrar por Elemento
+                            <i class="fas fa-fire me-1"></i> Por Elemento
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{% url 'jutsu-list' %}?element=fire">🔥 Fogo</a></li>
@@ -103,12 +453,12 @@
                             <li><a class="dropdown-item" href="{% url 'jutsu-list' %}?element=lightning">⚡ Raio</a></li>
                             <li><a class="dropdown-item" href="{% url 'jutsu-list' %}?element=illusion">👁️ Genjutsu</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{% url 'jutsu-list' %}">🔄 Todos os Elementos</a></li>
+                            <li><a class="dropdown-item" href="{% url 'jutsu-list' %}">🔄 Todos</a></li>
                         </ul>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-tags me-1"></i> Filtrar por Tipo
+                            <i class="fas fa-tags me-1"></i> Por Tipo
                         </a>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="{% url 'jutsu-list' %}?type=offensive">⚔️ Ofensivo</a></li>
@@ -116,28 +466,37 @@
                             <li><a class="dropdown-item" href="{% url 'jutsu-list' %}?type=support">🧪 Suporte</a></li>
                             <li><a class="dropdown-item" href="{% url 'jutsu-list' %}?type=supplementary">📚 Suplementar</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{% url 'jutsu-list' %}">🔄 Todos os Tipos</a></li>
+                            <li><a class="dropdown-item" href="{% url 'jutsu-list' %}">🔄 Todos</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link" href="{% url 'dashboard' %}">
+                            <i class="fas fa-chart-pie me-1"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" href="/swagger/">
-                            <i class="fas fa-code me-1"></i> API Docs
+                            <i class="fas fa-code me-1"></i> API
                         </a>
                     </li>
                 </ul>
                 <div class="d-flex">
                     {% if user.is_authenticated %}
                         <a href="{% url 'jutsu-create' %}" class="btn btn-success me-2">
-                            <i class="fas fa-plus me-1"></i> Adicionar Jutsu
+                            <i class="fas fa-plus me-1"></i> Novo Jutsu
                         </a>
-                        <a href="{% url 'admin:index' %}" class="btn btn-outline-dark me-2">
-                            <i class="fas fa-user-ninja me-1"></i> Admin
-                        </a>
-                        <a href="{% url 'admin:logout' %}" class="btn btn-outline-danger">
-                            <i class="fas fa-sign-out-alt me-1"></i> Sair
-                        </a>
+                        <div class="dropdown">
+                            <button class="btn btn-outline-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user-ninja me-1"></i> {{ user.username }}
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end">
+                                <li><a class="dropdown-item" href="{% url 'admin:index' %}"><i class="fas fa-cogs me-2"></i>Admin</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="{% url 'admin:logout' %}"><i class="fas fa-sign-out-alt me-2"></i>Sair</a></li>
+                            </ul>
+                        </div>
                     {% else %}
-                        <a href="{% url 'admin:login' %}" class="btn btn-outline-dark">
+                        <a href="{% url 'admin:login' %}" class="btn btn-outline-light">
                             <i class="fas fa-sign-in-alt me-1"></i> Login
                         </a>
                     {% endif %}
@@ -146,6 +505,7 @@
         </div>
     </nav>
 
+    <!-- Conteúdo principal -->
     <main class="container py-4">
         {% if messages %}
             <div class="messages mb-4">
@@ -162,25 +522,36 @@
         {% endblock %}
     </main>
 
-    <footer class="mt-auto py-4 text-center">
+    <!-- Botão de voltar ao topo -->
+    <div class="scroll-to-top">
+        <i class="fas fa-arrow-up"></i>
+    </div>
+
+    <!-- Rodapé -->
+    <footer class="mt-auto py-4">
         <div class="container">
             <div class="row">
-                <div class="col-md-4">
+                <div class="col-md-4 mb-4 mb-md-0">
                     <h5>Sobre o Projeto</h5>
-                    <p class="small">Um catálogo de jutsus do universo Naruto desenvolvido com Django.</p>
+                    <p class="small">Um catálogo completo de jutsus do universo Naruto desenvolvido com Django. Projeto de portfólio para demonstrar habilidades em desenvolvimento web.</p>
                 </div>
-                <div class="col-md-4">
+                <div class="col-md-4 mb-4 mb-md-0">
                     <h5>Links Úteis</h5>
                     <ul class="list-unstyled">
-                        <li><a href="{% url 'jutsu-list' %}" class="text-light">Home</a></li>
-                        <li><a href="/api/" class="text-light">API</a></li>
-                        <li><a href="/admin/" class="text-light">Admin</a></li>
+                        <li class="mb-2"><a href="{% url 'home' %}"><i class="fas fa-home me-2"></i>Página Inicial</a></li>
+                        <li class="mb-2"><a href="{% url 'jutsu-list' %}"><i class="fas fa-scroll me-2"></i>Catálogo</a></li>
+                        <li class="mb-2"><a href="{% url 'dashboard' %}"><i class="fas fa-chart-bar me-2"></i>Dashboard</a></li>
+                        <li class="mb-2"><a href="/api/"><i class="fas fa-server me-2"></i>API REST</a></li>
+                        <li><a href="/admin/"><i class="fas fa-lock me-2"></i>Área Administrativa</a></li>
                     </ul>
                 </div>
                 <div class="col-md-4">
                     <h5>Tecnologias</h5>
-                    <p class="small">Django, Bootstrap, Django REST Framework</p>
-                    <p class="small">© 2025 - Desenvolvido por um Shinobi com Django</p>
+                    <p class="small mb-2"><i class="fab fa-python me-2"></i>Django 5.2</p>
+                    <p class="small mb-2"><i class="fab fa-bootstrap me-2"></i>Bootstrap 5</p>
+                    <p class="small mb-2"><i class="fas fa-database me-2"></i>SQLite</p>
+                    <p class="small mb-2"><i class="fas fa-code me-2"></i>Django REST Framework</p>
+                    <p class="small mt-4">© {% now "Y" %} - Desenvolvido por <a href="https://github.com/Augusto240" target="_blank">Augusto240</a></p>
                 </div>
             </div>
         </div>
@@ -188,5 +559,52 @@
 
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Scripts personalizados -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Animação para os cards
+            const cards = document.querySelectorAll('.card');
+            cards.forEach((card, index) => {
+                card.classList.add('animated-card');
+                card.style.animationDelay = `${index * 0.05}s`;
+            });
+            
+            // Botão de voltar ao topo
+            const scrollToTopBtn = document.querySelector('.scroll-to-top');
+            
+            window.addEventListener('scroll', function() {
+                // Mostrar/esconder botão de voltar ao topo
+                if (window.pageYOffset > 300) {
+                    scrollToTopBtn.classList.add('visible');
+                } else {
+                    scrollToTopBtn.classList.remove('visible');
+                }
+                
+                // Adicionar sombra à navegação ao rolar
+                const navbar = document.querySelector('.navbar');
+                if (window.pageYOffset > 50) {
+                    navbar.classList.add('navbar-scrolled');
+                } else {
+                    navbar.classList.remove('navbar-scrolled');
+                }
+            })
+            
+            scrollToTopBtn.addEventListener('click', function() {
+                window.scrollTo({
+                    top: 0,
+                    behavior: 'smooth'
+                });
+            });
+            
+            // Adicionar classe baseada no elemento para os cards
+            document.querySelectorAll('[data-element]').forEach(function(el) {
+                const element = el.getAttribute('data-element');
+                el.classList.add(`element-${element}`);
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
 </body>
-</html>
+</html>s

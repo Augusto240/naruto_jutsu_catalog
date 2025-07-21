@@ -1,17 +1,107 @@
 {% extends 'catalog/base.html' %}
 
-{% block title %}Confirmar Exclusão{% endblock %}
+{% block title %}Confirmar Exclusão - {{ jutsu.name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .delete-warning {
+        background-color: #f8d7da;
+        border-left: 5px solid #dc3545;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border-radius: 8px;
+    }
+    
+    .delete-warning h2 {
+        color: #721c24;
+        margin-bottom: 1rem;
+    }
+    
+    .delete-warning p {
+        color: #721c24;
+        font-size: 1.1rem;
+    }
+    
+    .jutsu-info {
+        background-color: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
+    
+    .jutsu-info h3 {
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .btn-confirm-delete {
+        background-color: #dc3545;
+        border-color: #dc3545;
+        color: white;
+        font-weight: 500;
+        padding: 0.6rem 1.5rem;
+    }
+    
+    .btn-confirm-delete:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+    
+    .confirmation-text {
+        font-size: 1.2rem;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-    <h1>Confirmar Exclusão</h1>
-    <hr>
-    
-    <p class="fs-5">Você tem certeza que deseja apagar o pergaminho do jutsu <strong>"{{ jutsu.name }}"</strong>?</p>
-    <p class="text-danger">Esta ação não pode ser desfeita.</p>
-
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-danger">Sim, apagar para sempre</button>
-        <a href="{% url 'jutsu-detail' jutsu.pk %}" class="btn btn-secondary">Não, voltar</a>
-    </form>
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Alerta de aviso -->
+            <div class="delete-warning">
+                <h2><i class="fas fa-exclamation-triangle me-2"></i> Aviso de Exclusão</h2>
+                <p>Você está prestes a <strong>apagar permanentemente</strong> este jutsu do catálogo. Esta ação não pode ser desfeita.</p>
+            </div>
+            
+            <!-- Informações do jutsu -->
+            <div class="jutsu-info">
+                <h3>{{ jutsu.name }}</h3>
+                <div class="mb-3">
+                    <span class="element-badge {{ jutsu.element_type }}">{{ jutsu.get_element_type_display }}</span>
+                    <span class="badge bg-secondary">{{ jutsu.get_jutsu_type_display }}</span>
+                    <span class="rank-badge rank-{{ jutsu.rank|lower }}">{{ jutsu.rank }}</span>
+                </div>
+                <p>{{ jutsu.description|truncatewords:30 }}</p>
+                
+                {% if jutsu.image %}
+                <div class="text-center mb-3">
+                    <img src="{{ jutsu.image.url }}" alt="{{ jutsu.name }}" style="max-height: 200px; border-radius: 8px;">
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Formulário de confirmação -->
+            <p class="confirmation-text text-center">Tem certeza que deseja excluir este jutsu?</p>
+            
+            <form method="post" class="text-center">
+                {% csrf_token %}
+                <div class="action-buttons justify-content-center">
+                    <a href="{% url 'jutsu-detail' jutsu.pk %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i>Cancelar
+                    </a>
+                    <button type="submit" class="btn btn-confirm-delete">
+                        <i class="fas fa-trash-alt me-2"></i>Sim, excluir permanentemente
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

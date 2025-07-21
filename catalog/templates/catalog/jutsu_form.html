@@ -1,16 +1,208 @@
 {% extends 'catalog/base.html' %}
+{% load crispy_forms_tags %}
 
 {% block title %}{{ form_title }}{% endblock %}
 
+{% block extra_css %}
+<style>
+    .form-header {
+        background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
+                    url('https://raw.githubusercontent.com/Augusto240/naruto-assets/main/form-bg.jpg');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        padding: 2rem 0;
+        margin-bottom: 2rem;
+        border-radius: 12px;
+    }
+    
+    .form-header h1 {
+        font-size: 2rem;
+        font-weight: 700;
+    }
+    
+    .form-header p {
+        max-width: 700px;
+        opacity: 0.9;
+    }
+    
+    .form-card {
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        overflow: hidden;
+    }
+    
+    .form-card .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        font-weight: 600;
+    }
+    
+    .form-section {
+        margin-bottom: 2rem;
+        padding-bottom: 2rem;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .form-section:last-child {
+        margin-bottom: 0;
+        padding-bottom: 0;
+        border-bottom: none;
+    }
+    
+    .form-section-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        margin-bottom: 1.5rem;
+        color: var(--naruto-blue);
+    }
+    
+    .submit-section {
+        margin-top: 2rem;
+    }
+    
+    .submit-section .btn {
+        padding: 0.6rem 2rem;
+        font-weight: 500;
+    }
+    
+    .image-preview {
+        max-height: 250px;
+        object-fit: contain;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+        margin-top: 10px;
+    }
+    
+    .hint-text {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<h1>{{ form_title }}</h1>
+<!-- Cabeçalho do formulário -->
+<section class="form-header">
+    <div class="container">
+        <h1>{{ form_title }}</h1>
+        <p>
+            {% if 'Adicionar' in form_title %}
+                Registre um novo jutsu no catálogo e compartilhe seu conhecimento shinobi!
+            {% else %}
+                Atualize as informações deste jutsu para manter o catálogo sempre preciso.
+            {% endif %}
+        </p>
+    </div>
+</section>
 
-<form method="post" enctype="multipart/form-data">
-    {% csrf_token %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="card form-card">
+                <div class="card-header">
+                    <i class="fas fa-scroll me-2"></i> {{ form_title }}
+                </div>
+                <div class="card-body">
+                    <form method="post" enctype="multipart/form-data" class="jutsu-form">
+                        {% csrf_token %}
+                        
+                        <!-- Seção de informações básicas -->
+                        <div class="form-section">
+                            <h3 class="form-section-title"><i class="fas fa-info-circle me-2"></i> Informações Básicas</h3>
+                            <div class="row">
+                                <div class="col-md-7">
+                                    {{ form.name|as_crispy_field }}
+                                </div>
+                                <div class="col-md-5">
+                                    {{ form.rank|as_crispy_field }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Seção de classificação -->
+                        <div class="form-section">
+                            <h3 class="form-section-title"><i class="fas fa-tag me-2"></i> Classificação</h3>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    {{ form.element_type|as_crispy_field }}
+                                </div>
+                                <div class="col-md-6">
+                                    {{ form.jutsu_type|as_crispy_field }}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Seção de descrição -->
+                        <div class="form-section">
+                            <h3 class="form-section-title"><i class="fas fa-book me-2"></i> Descrição</h3>
+                            {{ form.description|as_crispy_field }}
+                        </div>
+                        
+                        <!-- Seção de imagem -->
+                        <div class="form-section">
+                            <h3 class="form-section-title"><i class="fas fa-image me-2"></i> Imagem</h3>
+                            <div class="row">
+                                <div class="col-md-8">
+                                    {{ form.image|as_crispy_field }}
+                                    <p class="hint-text mt-2">
+                                        <i class="fas fa-info-circle me-1"></i> Formatos aceitos: JPG, PNG e GIF. Tamanho máximo: 5MB.
+                                    </p>
+                                </div>
+                                <div class="col-md-4">
+                                    {% if form.instance.image %}
+                                        <p class="mb-2">Imagem atual:</p>
+                                        <img src="{{ form.instance.image.url }}" alt="Preview" class="image-preview">
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Botões de ação -->
+                        <div class="submit-section d-flex justify-content-between">
+                            <a href="{% if object %}{% url 'jutsu-detail' object.pk %}{% else %}{% url 'jutsu-list' %}{% endif %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-2"></i>Cancelar
+                            </a>
+                            <button type="submit" class="btn btn-success">
+                                <i class="fas fa-save me-2"></i>{{ submit_text }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
-    {{ form.as_p }}
-
-    <button type="submit" class="btn btn-success">{{ submit_text }}</button>
-    <a href="{{ object.get_absolute_url|default:'/' }}" class="btn btn-secondary">Cancelar</a>
-</form>
+{% block extra_js %}
+<script>
+    // Preview de imagem quando selecionada
+    document.addEventListener('DOMContentLoaded', function() {
+        const imageInput = document.getElementById('id_image');
+        if (imageInput) {
+            imageInput.addEventListener('change', function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    
+                    // Verificar se já existe uma preview
+                    let preview = document.querySelector('.image-preview');
+                    if (!preview) {
+                        // Se não existir, criar uma nova
+                        preview = document.createElement('img');
+                        preview.className = 'image-preview';
+                        this.parentNode.appendChild(preview);
+                    }
+                    
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                    }
+                    
+                    reader.readAsDataURL(file);
+                }
+            });
+        }
+    });
+</script>
 {% endblock %}

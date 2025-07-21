@@ -2,118 +2,236 @@
 
 {% block title %}Dashboard - Estatísticas de Jutsus{% endblock %}
 
+{% block extra_css %}
+<style>
+    .dashboard-header {
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                    url('https://raw.githubusercontent.com/Augusto240/naruto-assets/main/dashboard-bg.jpg');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        padding: 3rem 0;
+        margin-bottom: 3rem;
+        border-radius: 12px;
+        text-align: center;
+    }
+    
+    .dashboard-header h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .dashboard-header p {
+        font-size: 1.1rem;
+        max-width: 700px;
+        margin: 0 auto;
+        opacity: 0.9;
+    }
+    
+    .stat-card {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+        text-align: center;
+        height: 100%;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    }
+    
+    .stat-card .card-body {
+        padding: 2rem;
+    }
+    
+    .stat-number {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        line-height: 1;
+        color: var(--naruto-blue);
+    }
+    
+    .stat-label {
+        font-size: 1.1rem;
+        color: #6c757d;
+    }
+    
+    .chart-card {
+        border-radius: 12px;
+        border: none;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        margin-bottom: 2rem;
+        overflow: hidden;
+        height: 100%;
+    }
+    
+    .chart-card .card-header {
+        background-color: #f8f9fa;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        font-weight: 600;
+        padding: 1rem 1.5rem;
+    }
+    
+    .chart-card .card-body {
+        padding: 1.5rem;
+    }
+    
+    .recent-jutsu-item {
+        transition: all 0.2s ease;
+    }
+    
+    .recent-jutsu-item:hover {
+        background-color: #f8f9fa;
+        transform: translateX(5px);
+    }
+    
+    .element-color {
+        width: 12px;
+        height: 12px;
+        display: inline-block;
+        border-radius: 50%;
+        margin-right: 5px;
+    }
+    
+    .element-color.fire { background-color: #FF4500; }
+    .element-color.water { background-color: #1E90FF; }
+    .element-color.wind { background-color: #98FB98; }
+    .element-color.earth { background-color: #8B4513; }
+    .element-color.lightning { background-color: #FFD700; }
+    .element-color.illusion { background-color: #9370DB; }
+    .element-color.other { background-color: #A9A9A9; }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="row mb-4">
-    <div class="col">
-        <h1 class="mb-4">Dashboard de Jutsus</h1>
-        <div class="alert alert-info">
-            <i class="fas fa-info-circle me-2"></i> Estatísticas baseadas nos dados do catálogo atual.
-        </div>
+<!-- Dashboard Header -->
+<section class="dashboard-header">
+    <div class="container">
+        <h1><i class="fas fa-chart-pie me-3"></i>Dashboard de Jutsus</h1>
+        <p>Visualize estatísticas detalhadas sobre o catálogo de jutsus, incluindo distribuição por elemento, tipo e rank.</p>
     </div>
-</div>
+</section>
 
-<div class="row">
-    <!-- Card com total de jutsus -->
-    <div class="col-md-4 mb-4">
-        <div class="card text-center h-100">
-            <div class="card-body">
-                <h5 class="card-title">Total de Jutsus</h5>
-                <p class="card-text display-4">{{ total_jutsus }}</p>
+<div class="container">
+    <!-- Cards de estatísticas -->
+    <div class="row mb-5">
+        <div class="col-md-4 mb-4">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <i class="fas fa-scroll fa-2x mb-3 text-primary"></i>
+                    <div class="stat-number">{{ total_jutsus }}</div>
+                    <div class="stat-label">Jutsus Cadastrados</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <i class="fas fa-fire fa-2x mb-3 text-warning"></i>
+                    <div class="stat-number">{{ total_elements }}</div>
+                    <div class="stat-label">Elementos Diferentes</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card stat-card">
+                <div class="card-body">
+                    <i class="fas fa-clock fa-2x mb-3 text-success"></i>
+                    <div class="stat-number">
+                        {% if recent_jutsus %}
+                            {{ recent_jutsus.0.created_at|date:"d/m" }}
+                        {% else %}
+                            --
+                        {% endif %}
+                    </div>
+                    <div class="stat-label">Data do Jutsu Mais Recente</div>
+                </div>
             </div>
         </div>
     </div>
     
-    <!-- Card com total de elementos -->
-    <div class="col-md-4 mb-4">
-        <div class="card text-center h-100">
-            <div class="card-body">
-                <h5 class="card-title">Elementos Diferentes</h5>
-                <p class="card-text display-4">{{ total_elements }}</p>
+    <!-- Gráficos e listas -->
+    <div class="row">
+        <!-- Gráfico de elementos -->
+        <div class="col-lg-6 mb-4">
+            <div class="chart-card h-100">
+                <div class="card-header">
+                    <i class="fas fa-fire me-2"></i> Distribuição por Elemento
+                </div>
+                <div class="card-body">
+                    <canvas id="elementsChart" height="260"></canvas>
+                </div>
             </div>
         </div>
-    </div>
-    
-    <!-- Card com jutsu mais recente -->
-    <div class="col-md-4 mb-4">
-        <div class="card text-center h-100">
-            <div class="card-body">
-                <h5 class="card-title">Último Jutsu Adicionado</h5>
-                {% if recent_jutsus %}
-                    <p class="card-text">{{ recent_jutsus.0.name }}</p>
-                    <p class="card-text"><small class="text-muted">{{ recent_jutsus.0.created_at|date:"d/m/Y H:i" }}</small></p>
-                    <a href="{% url 'jutsu-detail' recent_jutsus.0.pk %}" class="btn btn-sm btn-primary">Ver Detalhes</a>
-                {% else %}
-                    <p class="card-text">Nenhum jutsu cadastrado ainda</p>
-                {% endif %}
+        
+        <!-- Gráfico de tipos -->
+        <div class="col-lg-6 mb-4">
+            <div class="chart-card h-100">
+                <div class="card-header">
+                    <i class="fas fa-tags me-2"></i> Distribuição por Tipo
+                </div>
+                <div class="card-body">
+                    <canvas id="typesChart" height="260"></canvas>
+                </div>
             </div>
         </div>
-    </div>
-</div>
-
-<div class="row mb-4">
-    <!-- Gráfico de elementos -->
-    <div class="col-md-6 mb-4">
-        <div class="card h-100">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Distribuição por Elemento</h5>
-            </div>
-            <div class="card-body">
-                <canvas id="elementsChart"></canvas>
+        
+        <!-- Gráfico de ranks -->
+        <div class="col-lg-6 mb-4">
+            <div class="chart-card h-100">
+                <div class="card-header">
+                    <i class="fas fa-star me-2"></i> Distribuição por Rank
+                </div>
+                <div class="card-body">
+                    <canvas id="ranksChart" height="260"></canvas>
+                </div>
             </div>
         </div>
-    </div>
-    
-    <!-- Gráfico de tipos -->
-    <div class="col-md-6 mb-4">
-        <div class="card h-100">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Distribuição por Tipo</h5>
-            </div>
-            <div class="card-body">
-                <canvas id="typesChart"></canvas>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="row mb-4">
-    <!-- Gráfico de ranks -->
-    <div class="col-md-6 mb-4">
-        <div class="card h-100">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Distribuição por Rank</h5>
-            </div>
-            <div class="card-body">
-                <canvas id="ranksChart"></canvas>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Lista de jutsus recentes -->
-    <div class="col-md-6 mb-4">
-        <div class="card h-100">
-            <div class="card-header">
-                <h5 class="card-title mb-0">Jutsus Recentes</h5>
-            </div>
-            <div class="card-body">
-                <div class="list-group">
-                    {% for jutsu in recent_jutsus %}
-                        <a href="{% url 'jutsu-detail' jutsu.pk %}" class="list-group-item list-group-item-action">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h5 class="mb-1">{{ jutsu.name }}</h5>
-                                <small>{{ jutsu.created_at|date:"d/m/Y" }}</small>
-                            </div>
-                            <p class="mb-1">{{ jutsu.get_element_type_display }} | {{ jutsu.get_jutsu_type_display }}</p>
+        
+        <!-- Lista de jutsus recentes -->
+        <div class="col-lg-6 mb-4">
+            <div class="chart-card h-100">
+                <div class="card-header">
+                    <i class="fas fa-history me-2"></i> Jutsus Recentes
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        {% for jutsu in recent_jutsus %}
+                            <a href="{% url 'jutsu-detail' jutsu.pk %}" class="list-group-item list-group-item-action recent-jutsu-item">
+                                <div class="d-flex w-100 justify-content-between align-items-center">
+                                    <h6 class="mb-1">
+                                        <span class="element-color {{ jutsu.element_type }}"></span>
+                                        {{ jutsu.name }}
+                                    </h6>
+                                    <small class="text-muted">{{ jutsu.created_at|date:"d/m/Y" }}</small>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted">{{ jutsu.get_element_type_display }} | {{ jutsu.get_jutsu_type_display }}</small>
+                                    <span class="rank-badge rank-{{ jutsu.rank|lower }}">{{ jutsu.rank }}</span>
+                                </div>
+                            </a>
+                        {% empty %}
+                            <p class="text-muted text-center py-4">Nenhum jutsu cadastrado ainda.</p>
+                        {% endfor %}
+                    </div>
+                    
+                    <div class="text-center mt-3">
+                        <a href="{% url 'jutsu-list' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-list me-2"></i>Ver Todos os Jutsus
                         </a>
-                    {% empty %}
-                        <p class="text-muted">Nenhum jutsu cadastrado ainda.</p>
-                    {% endfor %}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
+{% block extra_js %}
 <!-- Chart.js para os gráficos -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
@@ -141,100 +259,85 @@
         
         const rankColors = ['#C0C0C0', '#CD7F32', '#FFD700', '#00BFFF', '#FF4500', '#9400D3', '#8B0000'];
         
+        // Função para criar gráficos com animação
+        function createAnimatedChart(ctx, type, labels, data, colors, options = {}) {
+            return new Chart(ctx, {
+                type: type,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors,
+                        borderWidth: 0,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        animateScale: true,
+                        animateRotate: true
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                font: {
+                                    size: 12
+                                },
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    },
+                    ...options
+                }
+            });
+        }
+        
         // Gráfico de elementos
         const elementsCtx = document.getElementById('elementsChart').getContext('2d');
-        const elementsChart = new Chart(elementsCtx, {
-            type: 'pie',
-            data: {
-                labels: [
-                    {% for label in elements_labels %}
-                        '{{ label|capfirst }}',
-                    {% endfor %}
-                ],
-                datasets: [{
-                    data: [
-                        {% for value in elements_data %}
-                            {{ value }},
-                        {% endfor %}
-                    ],
-                    backgroundColor: [
-                        {% for label in elements_labels %}
-                            elementColors['{{ label }}'] || '#A9A9A9',
-                        {% endfor %}
-                    ]
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'right',
-                    }
-                }
-            }
-        });
+        const elementsLabels = [{% for label in elements_labels %}'{{ label|capfirst }}',{% endfor %}];
+        const elementsData = [{% for value in elements_data %}{{ value }},{% endfor %}];
+        const elementsChartColors = elementsLabels.map(label => elementColors[label.toLowerCase()] || '#A9A9A9');
+        
+        createAnimatedChart(elementsCtx, 'doughnut', elementsLabels, elementsData, elementsChartColors);
         
         // Gráfico de tipos
         const typesCtx = document.getElementById('typesChart').getContext('2d');
-        const typesChart = new Chart(typesCtx, {
-            type: 'doughnut',
-            data: {
-                labels: [
-                    {% for label in types_labels %}
-                        '{{ label|capfirst }}',
-                    {% endfor %}
-                ],
-                datasets: [{
-                    data: [
-                        {% for value in types_data %}
-                            {{ value }},
-                        {% endfor %}
-                    ],
-                    backgroundColor: [
-                        {% for label in types_labels %}
-                            typeColors['{{ label }}'] || '#A9A9A9',
-                        {% endfor %}
-                    ]
-                }]
-            },
-            options: {
-                responsive: true,
-                plugins: {
-                    legend: {
-                        position: 'right',
-                    }
-                }
-            }
-        });
+        const typesLabels = [{% for label in types_labels %}'{{ label|capfirst }}',{% endfor %}];
+        const typesData = [{% for value in types_data %}{{ value }},{% endfor %}];
+        const typesChartColors = typesLabels.map(label => typeColors[label.toLowerCase()] || '#A9A9A9');
+        
+        createAnimatedChart(typesCtx, 'pie', typesLabels, typesData, typesChartColors);
         
         // Gráfico de ranks
         const ranksCtx = document.getElementById('ranksChart').getContext('2d');
-        const ranksChart = new Chart(ranksCtx, {
-            type: 'bar',
-            data: {
-                labels: [
-                    {% for label in ranks_labels %}
-                        'Rank {{ label }}',
-                    {% endfor %}
-                ],
-                datasets: [{
-                    label: 'Quantidade de Jutsus',
-                    data: [
-                        {% for value in ranks_data %}
-                            {{ value }},
-                        {% endfor %}
-                    ],
-                    backgroundColor: rankColors
-                }]
+        const ranksLabels = [{% for label in ranks_labels %}'Rank {{ label }}',{% endfor %}];
+        const ranksData = [{% for value in ranks_data %}{{ value }},{% endfor %}];
+        
+        createAnimatedChart(ranksCtx, 'bar', ranksLabels, ranksData, rankColors, {
+            indexAxis: 'y',
+            plugins: {
+                legend: {
+                    display: false
+                }
             },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            precision: 0
-                        }
+            scales: {
+                x: {
+                    beginAtZero: true,
+                    ticks: {
+                        precision: 0
                     }
                 }
             }

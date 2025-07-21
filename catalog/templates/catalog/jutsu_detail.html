@@ -1,45 +1,250 @@
 {% extends 'catalog/base.html' %}
 
-{% block title %}{{ jutsu.name }}{% endblock %}
+{% block title %}{{ jutsu.name }} | Detalhes do Jutsu{% endblock %}
+
+{% block extra_css %}
+<style>
+    .jutsu-header {
+        background: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), 
+                    url('https://raw.githubusercontent.com/Augusto240/naruto-assets/main/header-bg.jpg');
+        background-size: cover;
+        background-position: center;
+        color: white;
+        padding: 2.5rem 0;
+        margin-bottom: 2rem;
+        border-radius: 12px;
+    }
+    
+    .jutsu-image {
+        max-height: 350px;
+        object-fit: cover;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    
+    .jutsu-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+    
+    .jutsu-detail-card {
+        border-radius: 12px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        margin-bottom: 2rem;
+        overflow: hidden;
+    }
+    
+    .jutsu-detail-card .card-header {
+        padding: 1rem 1.5rem;
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+    
+    .jutsu-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .jutsu-meta-item {
+        display: flex;
+        align-items: center;
+        background-color: #f8f9fa;
+        padding: 0.5rem 1rem;
+        border-radius: 50px;
+        font-weight: 500;
+    }
+    
+    .jutsu-meta-item i {
+        margin-right: 0.5rem;
+        font-size: 1.2rem;
+    }
+    
+    .description-content {
+        font-size: 1.1rem;
+        line-height: 1.6;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 2rem;
+    }
+    
+    .action-buttons .btn {
+        padding: 0.5rem 1.5rem;
+        font-weight: 500;
+    }
+    
+    .related-jutsus {
+        margin-top: 3rem;
+    }
+    
+    .related-jutsus h3 {
+        margin-bottom: 1.5rem;
+        position: relative;
+        padding-bottom: 0.5rem;
+    }
+    
+    .related-jutsus h3::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: var(--naruto-orange);
+        border-radius: 3px;
+    }
+    
+    .element-icon {
+        font-size: 1.5rem;
+        margin-right: 0.5rem;
+    }
+    
+    .element-icon.fire { color: #FF4500; }
+    .element-icon.water { color: #1E90FF; }
+    .element-icon.wind { color: #98FB98; }
+    .element-icon.earth { color: #8B4513; }
+    .element-icon.lightning { color: #FFD700; }
+    .element-icon.illusion { color: #9370DB; }
+    
+    .metadata-section {
+        background-color: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="card shadow">
-    <div class="card-header">
-        <h2>{{ jutsu.name }}</h2>
-    </div>
-    <div class="card-body">
-        <div class="row">
-            <div class="col-md-8">
-                <p><strong>Rank:</strong> <span class="badge bg-secondary">{{ jutsu.get_rank_display }}</span></p>
-                <p><strong>Elemento:</strong> {{ jutsu.get_element_type_display }}</p>
-                <p><strong>Tipo:</strong> {{ jutsu.get_jutsu_type_display }}</p>
-                
-                <hr>
-
-                <p><strong>Descrição do Pergaminho:</strong></p>
-                <p>{{ jutsu.description|linebreaks }}</p>
-
-                <small class="text-muted">Registrado em: {{ jutsu.created_at|date:"d/m/Y H:i" }}</small>
-            </div>
-            <div class="col-md-4">
-                {% if jutsu.image %}
-                    <div class="text-center">
-                        <img src="{{ jutsu.image.url }}" alt="{{ jutsu.name }}" class="img-fluid rounded mb-3" style="max-height: 300px;">
+<!-- Jutsu Header -->
+<section class="jutsu-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8">
+                <h1 class="jutsu-title">{{ jutsu.name }}</h1>
+                <div class="jutsu-meta">
+                    <div class="jutsu-meta-item">
+                        {% if jutsu.element_type == 'fire' %}
+                            <i class="fas fa-fire element-icon fire"></i>
+                        {% elif jutsu.element_type == 'water' %}
+                            <i class="fas fa-water element-icon water"></i>
+                        {% elif jutsu.element_type == 'wind' %}
+                            <i class="fas fa-wind element-icon wind"></i>
+                        {% elif jutsu.element_type == 'earth' %}
+                            <i class="fas fa-mountain element-icon earth"></i>
+                        {% elif jutsu.element_type == 'lightning' %}
+                            <i class="fas fa-bolt element-icon lightning"></i>
+                        {% elif jutsu.element_type == 'illusion' %}
+                            <i class="fas fa-eye element-icon illusion"></i>
+                        {% else %}
+                            <i class="fas fa-question element-icon"></i>
+                        {% endif %}
+                        {{ jutsu.get_element_type_display }}
                     </div>
-                {% else %}
-                    <div class="text-center p-5 bg-light rounded mb-3">
-                        <p class="text-muted">Sem imagem</p>
+                    <div class="jutsu-meta-item">
+                        {% if jutsu.jutsu_type == 'offensive' %}
+                            <i class="fas fa-gavel"></i>
+                        {% elif jutsu.jutsu_type == 'defensive' %}
+                            <i class="fas fa-shield-alt"></i>
+                        {% elif jutsu.jutsu_type == 'support' %}
+                            <i class="fas fa-hands-helping"></i>
+                        {% else %}
+                            <i class="fas fa-book"></i>
+                        {% endif %}
+                        {{ jutsu.get_jutsu_type_display }}
                     </div>
-                {% endif %}
+                    <div class="jutsu-meta-item">
+                        <i class="fas fa-star"></i>
+                        Rank {{ jutsu.get_rank_display }}
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-    <div class="card-footer text-end">
-        {% if user.is_authenticated %}
-            <a href="{% url 'jutsu-edit' jutsu.pk %}" class="btn btn-warning">Editar</a>
-            <a href="{% url 'jutsu-delete' jutsu.pk %}" class="btn btn-danger">Excluir</a>
-        {% endif %}
-        <a href="{% url 'jutsu-list' %}" class="btn btn-secondary">Voltar para a Lista</a>
+</section>
+
+<div class="container">
+    <div class="row">
+        <!-- Coluna principal -->
+        <div class="col-lg-8">
+            <!-- Card de descrição -->
+            <div class="card jutsu-detail-card">
+                <div class="card-header">
+                    <i class="fas fa-scroll me-2"></i> Descrição do Jutsu
+                </div>
+                <div class="card-body">
+                    <div class="description-content">
+                        {{ jutsu.description|linebreaks }}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Ações do jutsu -->
+            <div class="action-buttons">
+                <a href="{% url 'jutsu-list' %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i>Voltar para o Catálogo
+                </a>
+                {% if user.is_authenticated %}
+                    <a href="{% url 'jutsu-edit' jutsu.pk %}" class="btn btn-warning">
+                        <i class="fas fa-edit me-2"></i>Editar
+                    </a>
+                    <a href="{% url 'jutsu-delete' jutsu.pk %}" class="btn btn-danger">
+                        <i class="fas fa-trash-alt me-2"></i>Excluir
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Coluna lateral -->
+        <div class="col-lg-4">
+            <!-- Imagem do jutsu -->
+            {% if jutsu.image %}
+                <div class="mb-4">
+                    <img src="{{ jutsu.image.url }}" alt="{{ jutsu.name }}" class="img-fluid jutsu-image w-100">
+                </div>
+            {% else %}
+                <div class="card mb-4">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-image fa-5x text-muted mb-3"></i>
+                        <p class="text-muted">Nenhuma imagem disponível para este jutsu.</p>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Informações adicionais -->
+            <div class="card jutsu-detail-card">
+                <div class="card-header">
+                    <i class="fas fa-info-circle me-2"></i> Informações
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-tag me-2"></i> Elemento:</span>
+                            <span class="element-badge {{ jutsu.element_type }}">{{ jutsu.get_element_type_display }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-list me-2"></i> Tipo:</span>
+                            <span class="badge bg-secondary">{{ jutsu.get_jutsu_type_display }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-star me-2"></i> Rank:</span>
+                            <span class="rank-badge rank-{{ jutsu.rank|lower }}">{{ jutsu.rank }}</span>
+                        </li>
+                    </ul>
+                    
+                    <div class="metadata-section mt-3">
+                        <p class="mb-1"><i class="fas fa-calendar-alt me-2"></i> Adicionado em: {{ jutsu.created_at|date:"d/m/Y H:i" }}</p>
+                        <p class="mb-0"><i class="fas fa-sync-alt me-2"></i> Atualizado em: {{ jutsu.updated_at|date:"d/m/Y H:i" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
-{% endblock %}
+{% endblock %}  

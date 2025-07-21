@@ -179,3 +179,27 @@ class DashboardView(TemplateView):
         context['recent_jutsus'] = Jutsu.objects.order_by('-created_at')[:5]
         
         return context
+    
+class HomeView(TemplateView):
+    """
+    View para a página inicial com jutsus em destaque.
+    """
+    template_name = 'catalog/home.html'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        
+        # Jutsus em destaque: os 3 jutsus mais recentes
+        context['latest_jutsus'] = Jutsu.objects.order_by('-created_at')[:3]
+        
+        # Jutsus por categoria
+        context['fire_jutsus'] = Jutsu.objects.filter(element_type='fire').order_by('?')[:2]
+        context['water_jutsus'] = Jutsu.objects.filter(element_type='water').order_by('?')[:2]
+        
+        # Jutsu de rank alto (A ou S)
+        context['high_rank_jutsus'] = Jutsu.objects.filter(rank__in=['A', 'S', 'SS']).order_by('?')[:3]
+        
+        # Total de jutsus no catálogo
+        context['total_jutsus'] = Jutsu.objects.count()
+        
+        return context

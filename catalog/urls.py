@@ -1,5 +1,6 @@
 from django.urls import path
 from .views import (
+    HomeView,
     JutsuListView,
     JutsuDetailView,
     JutsuCreateView,
@@ -9,21 +10,24 @@ from .views import (
 )
 
 urlpatterns = [
-    # Caminho Raiz: '' (vazio) -> A "página inicial" do nosso app.
-    path('', JutsuListView.as_view(), name='jutsu-list'),
-
+    # Página inicial
+    path('', HomeView.as_view(), name='home'),
+    
+    # Lista de jutsus
+    path('jutsus/', JutsuListView.as_view(), name='jutsu-list'),
+    
     # Dashboard com estatísticas
     path('dashboard/', DashboardView.as_view(), name='dashboard'),
 
-    # Caminho para Detalhes: 'jutsu/<int:pk>/'
+    # Detalhes do jutsu
     path('jutsu/<int:pk>/', JutsuDetailView.as_view(), name='jutsu-detail'),
 
-    # Caminho para Criar: 'jutsu/criar/'
+    # Criar novo jutsu
     path('jutsu/criar/', JutsuCreateView.as_view(), name='jutsu-create'),
 
-    # Caminho para Editar: 'jutsu/<int:pk>/editar/'
+    # Editar jutsu
     path('jutsu/<int:pk>/editar/', JutsuUpdateView.as_view(), name='jutsu-edit'),
 
-    # Caminho para Excluir: 'jutsu/<int:pk>/excluir/'
+    # Excluir jutsu
     path('jutsu/<int:pk>/excluir/', JutsuDeleteView.as_view(), name='jutsu-delete'),
 ]

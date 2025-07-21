@@ -1,15 +1,27 @@
 {% extends 'catalog/base.html' %}
 
-{% block title %}Lista de Jutsus{% endblock %}
+{% block title %}Catálogo de Jutsus{% endblock %}
 
 {% block content %}
 <div class="container">
-    <h1 class="mb-4">Pergaminhos de Jutsus Conhecidos</h1>
+    <!-- Cabeçalho da página -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="fas fa-scroll me-3 text-warning"></i>Pergaminhos de Jutsus</h1>
+        {% if user.is_authenticated %}
+        <a href="{% url 'jutsu-create' %}" class="btn btn-success">
+            <i class="fas fa-plus me-2"></i>Adicionar Novo Jutsu
+        </a>
+        {% endif %}
+    </div>
 
-    <div class="card card-body mb-4">
+    <!-- Formulário de busca e filtro -->
+    <div class="search-form mb-4">
         <form method="GET" action="{% url 'jutsu-list' %}" class="row g-3 align-items-center">
             <div class="col-md-5">
-                <input type="text" name="search" class="form-control" placeholder="Buscar por nome ou descrição..." value="{{ current_search }}">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" name="search" class="form-control" placeholder="Buscar por nome ou descrição..." value="{{ current_search }}">
+                </div>
             </div>
             <div class="col-md-3">
                 <select name="element" class="form-select">
@@ -20,52 +32,131 @@
                 </select>
             </div>
             <div class="col-md-2">
-                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+                <select name="type" class="form-select">
+                    <option value="">Todos os Tipos</option>
+                    {% for value, label in type_choices %}
+                        <option value="{{ value }}" {% if current_type == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
             </div>
             <div class="col-md-2">
-                <a href="{% url 'jutsu-list' %}" class="btn btn-secondary w-100">Limpar</a>
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-filter me-1"></i> Filtrar
+                    </button>
+                </div>
             </div>
+            {% if current_search or current_element or current_type %}
+            <div class="col-12 mt-2">
+                <div class="d-flex align-items-center">
+                    <span class="me-2">Filtros ativos:</span>
+                    {% if current_search %}
+                    <span class="badge bg-primary me-2">Busca: {{ current_search }}</span>
+                    {% endif %}
+                    {% if current_element %}
+                    <span class="badge bg-info me-2">Elemento: {{ current_element|capfirst }}</span>
+                    {% endif %}
+                    {% if current_type %}
+                    <span class="badge bg-secondary me-2">Tipo: {{ current_type|capfirst }}</span>
+                    {% endif %}
+                    <a href="{% url 'jutsu-list' %}" class="btn btn-sm btn-outline-danger ms-auto">
+                        <i class="fas fa-times me-1"></i> Limpar Filtros
+                    </a>
+                </div>
+            </div>
+            {% endif %}
         </form>
     </div>
 
+    <!-- Resultado da busca -->
     <div class="row">
         {% for jutsu in jutsus %}
-            <div class="col-md-4 mb-4">
-                <div class="card h-100 shadow-sm">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="card h-100 element-{{ jutsu.element_type }}" data-element="{{ jutsu.element_type }}">
+                    {% if jutsu.image %}
+                        <div class="card-img-top-container" style="height: 180px; overflow: hidden;">
+                            <img src="{{ jutsu.image.url }}" alt="{{ jutsu.name }}" class="card-img-top" style="object-fit: cover; height: 100%; width: 100%;">
+                        </div>
+                    {% endif %}
                     <div class="card-body">
-                        <h5 class="card-title">{{ jutsu.name }}</h5>
-                        <h6 class="card-subtitle mb-2 text-muted">{{ jutsu.get_element_type_display }} | Rank: {{ jutsu.rank }}</h6>
-                        <p class="card-text">{{ jutsu.description|truncatewords:20 }}</p>
-                        <a href="{% url 'jutsu-detail' jutsu.pk %}" class="btn btn-info btn-sm">Ver Detalhes</a>
+                        <div class="d-flex justify-content-between align-items-start mb-2">
+                            <h5 class="card-title mb-0">{{ jutsu.name }}</h5>
+                            <span class="rank-badge rank-{{ jutsu.rank|lower }}">{{ jutsu.rank }}</span>
+                        </div>
+                        <div class="mb-2">
+                            <span class="element-badge {{ jutsu.element_type }}">{{ jutsu.get_element_type_display }}</span>
+                            <span class="badge bg-secondary">{{ jutsu.get_jutsu_type_display }}</span>
+                        </div>
+                        <p class="card-text">{{ jutsu.description|truncatewords:15 }}</p>
+                    </div>
+                    <div class="card-footer bg-transparent border-top-0">
+                        <a href="{% url 'jutsu-detail' jutsu.pk %}" class="btn btn-primary w-100">
+                            <i class="fas fa-info-circle me-1"></i> Ver Detalhes
+                        </a>
                     </div>
                 </div>
             </div>
         {% empty %}
             <div class="col">
-                <p class="alert alert-warning">Nenhum jutsu encontrado com esses critérios. Tente uma busca ou filtro diferente!</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Nenhum jutsu encontrado com esses critérios. Tente uma busca ou filtro diferente!
+                </div>
             </div>
         {% endfor %}
     </div>
 
+    <!-- Paginação -->
     {% if is_paginated %}
-        <nav aria-label="Paginação de Jutsus">
+        <nav aria-label="Paginação de Jutsus" class="mt-4">
             <ul class="pagination justify-content-center">
                 {% if page_obj.has_previous %}
-                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo; Anterior</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% if current_search %}&search={{ current_search }}{% endif %}{% if current_element %}&element={{ current_element }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}">
+                            <i class="fas fa-angle-double-left"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_element %}&element={{ current_element }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}">
+                            <i class="fas fa-angle-left"></i> Anterior
+                        </a>
+                    </li>
                 {% else %}
-                    <li class="page-item disabled"><span class="page-link">&laquo; Anterior</span></li>
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="fas fa-angle-double-left"></i></span>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="fas fa-angle-left"></i> Anterior</span>
+                    </li>
                 {% endif %}
 
-                <li class="page-item active"><span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
+                <li class="page-item active">
+                    <span class="page-link">
+                        Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}
+                    </span>
+                </li>
 
                 {% if page_obj.has_next %}
-                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Próximo &raquo;</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_element %}&element={{ current_element }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}">
+                            Próximo <i class="fas fa-angle-right"></i>
+                        </a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if current_search %}&search={{ current_search }}{% endif %}{% if current_element %}&element={{ current_element }}{% endif %}{% if current_type %}&type={{ current_type }}{% endif %}">
+                            <i class="fas fa-angle-double-right"></i>
+                        </a>
+                    </li>
                 {% else %}
-                    <li class="page-item disabled"><span class="page-link">Próximo &raquo;</span></li>
+                    <li class="page-item disabled">
+                        <span class="page-link">Próximo <i class="fas fa-angle-right"></i></span>
+                    </li>
+                    <li class="page-item disabled">
+                        <span class="page-link"><i class="fas fa-angle-double-right"></i></span>
+                    </li>
                 {% endif %}
             </ul>
         </nav>
     {% endif %}
-
 </div>
 {% endblock %}
