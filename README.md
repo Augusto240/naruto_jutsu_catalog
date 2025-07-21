@@ -76,7 +76,13 @@ naruto_jutsu_catalog/
 └── manage.py               # Script de gerenciamento
 ```
 
-## 👤 Autor
-Augusto Oliveira 
+## Autor
+
+**Augusto Oliveira**
+
+* GitHub: [https://github.com/Augusto240](https://github.com/Augusto240)
+* LinkedIn: [https://www.linkedin.com/in/augusto-oliveira-4a8068235/](https://www.linkedin.com/in/augusto-oliveira-4a8068235/)
+* Portfólio: [https://augusto240.github.io/Personal-Site/](https://augusto240.github.io/Personal-Site/)
+
 
 Desenvolvido com 💖, chakra e Python!
