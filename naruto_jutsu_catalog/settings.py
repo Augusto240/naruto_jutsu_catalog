@@ -32,16 +32,13 @@ ALLOWED_HOSTS = []
 
 # naruto_jutsu_catalog/settings.py
 
-# Encontre a lista INSTALLED_APPS e adicione nossa aplicação
 INSTALLED_APPS = [
-    'django.contrib.admin',        # Interface de administração (como o escritório do Hokage)
-    'django.contrib.auth',         # Sistema de autenticação (como o sistema de ninjas registrados)
-    'django.contrib.contenttypes', # Sistema de tipos de conteúdo
-    'django.contrib.sessions',     # Gerenciamento de sessões (como lembrar quem está logado)
-    'django.contrib.messages',     # Sistema de mensagens (como pombos correio)
-    'django.contrib.staticfiles',  # Gerenciamento de arquivos estáticos (CSS, JS, imagens)
-    
-    # NOSSA APLICAÇÃO - isso é crucial!
+    'django.contrib.admin',       
+    'django.contrib.auth',        
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',     
+    'django.contrib.messages',    
+    'django.contrib.staticfiles',  
     'catalog.apps.CatalogConfig',
     'rest_framework',
     'django_filters',
@@ -135,7 +132,6 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = 'admin:login'
 
-# Configurações para o Django REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 10,
@@ -150,15 +146,12 @@ REST_FRAMEWORK = {
     ],
 }
 
-# Configurações para upload de arquivos
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Configuração do Debug Toolbar
 INTERNAL_IPS = [
     '127.0.0.1',
 ]
 
-# Configuração do Crispy Forms
 CRISPY_ALLOWED_TEMPLATE_PACKS = "bootstrap5"
 CRISPY_TEMPLATE_PACK = "bootstrap5"

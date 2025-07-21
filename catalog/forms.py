@@ -4,12 +4,6 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Submit, Row, Column, Div
 
 class JutsuForm(forms.ModelForm):
-    """
-    Formulário personalizado para o modelo Jutsu.
-    
-    Usar ModelForm nos dá todas as validações do modelo automaticamente
-    enquanto nos permite personalizar a aparência e comportamento.
-    """
     class Meta:
         model = Jutsu
         fields = ['name', 'description', 'element_type', 'jutsu_type', 'rank', 'image']

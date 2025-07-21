@@ -1,20 +1,10 @@
-# Django & Core
 Django==5.2.4
-Pillow==10.1.0  # Para processamento de imagens
-setuptools>=65.5.0  # Necessário para drf-yasg
-
-# Formulários e UI
+Pillow==10.1.0 
+setuptools>=65.5.0  
 django-crispy-forms==2.1
 crispy-bootstrap5==0.7
-
-# REST API
 djangorestframework==3.14.0
 django-filter==23.5
-drf-yasg==1.21.7  # Swagger/OpenAPI
-
-# Desenvolvimento e Debugging
+drf-yasg==1.21.7
 django-debug-toolbar==4.2.0
 
-# Produção (opcional, para quando estiver pronto para deploy)
-# gunicorn==21.2.0
-# whitenoise==6.5.0
