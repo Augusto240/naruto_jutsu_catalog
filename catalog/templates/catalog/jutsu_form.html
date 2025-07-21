@@ -1,0 +1,16 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}{{ form_title }}{% endblock %}
+
+{% block content %}
+<h1>{{ form_title }}</h1>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {{ form.as_p }}
+
+    <button type="submit" class="btn btn-success">{{ submit_text }}</button>
+    <a href="{{ object.get_absolute_url|default:'/' }}" class="btn btn-secondary">Cancelar</a>
+</form>
+{% endblock %}

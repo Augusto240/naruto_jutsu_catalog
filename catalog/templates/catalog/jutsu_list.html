@@ -1,0 +1,71 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Lista de Jutsus{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Pergaminhos de Jutsus Conhecidos</h1>
+
+    <div class="card card-body mb-4">
+        <form method="GET" action="{% url 'jutsu-list' %}" class="row g-3 align-items-center">
+            <div class="col-md-5">
+                <input type="text" name="search" class="form-control" placeholder="Buscar por nome ou descrição..." value="{{ current_search }}">
+            </div>
+            <div class="col-md-3">
+                <select name="element" class="form-select">
+                    <option value="">Todos os Elementos</option>
+                    {% for value, label in element_choices %}
+                        <option value="{{ value }}" {% if current_element == value %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'jutsu-list' %}" class="btn btn-secondary w-100">Limpar</a>
+            </div>
+        </form>
+    </div>
+
+    <div class="row">
+        {% for jutsu in jutsus %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ jutsu.name }}</h5>
+                        <h6 class="card-subtitle mb-2 text-muted">{{ jutsu.get_element_type_display }} | Rank: {{ jutsu.rank }}</h6>
+                        <p class="card-text">{{ jutsu.description|truncatewords:20 }}</p>
+                        <a href="{% url 'jutsu-detail' jutsu.pk %}" class="btn btn-info btn-sm">Ver Detalhes</a>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col">
+                <p class="alert alert-warning">Nenhum jutsu encontrado com esses critérios. Tente uma busca ou filtro diferente!</p>
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if is_paginated %}
+        <nav aria-label="Paginação de Jutsus">
+            <ul class="pagination justify-content-center">
+                {% if page_obj.has_previous %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">&laquo; Anterior</a></li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">&laquo; Anterior</span></li>
+                {% endif %}
+
+                <li class="page-item active"><span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span></li>
+
+                {% if page_obj.has_next %}
+                    <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">Próximo &raquo;</a></li>
+                {% else %}
+                    <li class="page-item disabled"><span class="page-link">Próximo &raquo;</span></li>
+                {% endif %}
+            </ul>
+        </nav>
+    {% endif %}
+
+</div>
+{% endblock %}

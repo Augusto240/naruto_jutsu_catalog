@@ -1,0 +1,244 @@
+{% extends 'catalog/base.html' %}
+
+{% block title %}Dashboard - Estatísticas de Jutsus{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="mb-4">Dashboard de Jutsus</h1>
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle me-2"></i> Estatísticas baseadas nos dados do catálogo atual.
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <!-- Card com total de jutsus -->
+    <div class="col-md-4 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h5 class="card-title">Total de Jutsus</h5>
+                <p class="card-text display-4">{{ total_jutsus }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Card com total de elementos -->
+    <div class="col-md-4 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h5 class="card-title">Elementos Diferentes</h5>
+                <p class="card-text display-4">{{ total_elements }}</p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Card com jutsu mais recente -->
+    <div class="col-md-4 mb-4">
+        <div class="card text-center h-100">
+            <div class="card-body">
+                <h5 class="card-title">Último Jutsu Adicionado</h5>
+                {% if recent_jutsus %}
+                    <p class="card-text">{{ recent_jutsus.0.name }}</p>
+                    <p class="card-text"><small class="text-muted">{{ recent_jutsus.0.created_at|date:"d/m/Y H:i" }}</small></p>
+                    <a href="{% url 'jutsu-detail' recent_jutsus.0.pk %}" class="btn btn-sm btn-primary">Ver Detalhes</a>
+                {% else %}
+                    <p class="card-text">Nenhum jutsu cadastrado ainda</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <!-- Gráfico de elementos -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Distribuição por Elemento</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="elementsChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Gráfico de tipos -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Distribuição por Tipo</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="typesChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <!-- Gráfico de ranks -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Distribuição por Rank</h5>
+            </div>
+            <div class="card-body">
+                <canvas id="ranksChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Lista de jutsus recentes -->
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <h5 class="card-title mb-0">Jutsus Recentes</h5>
+            </div>
+            <div class="card-body">
+                <div class="list-group">
+                    {% for jutsu in recent_jutsus %}
+                        <a href="{% url 'jutsu-detail' jutsu.pk %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h5 class="mb-1">{{ jutsu.name }}</h5>
+                                <small>{{ jutsu.created_at|date:"d/m/Y" }}</small>
+                            </div>
+                            <p class="mb-1">{{ jutsu.get_element_type_display }} | {{ jutsu.get_jutsu_type_display }}</p>
+                        </a>
+                    {% empty %}
+                        <p class="text-muted">Nenhum jutsu cadastrado ainda.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart.js para os gráficos -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Configurações de cores para os gráficos
+        const elementColors = {
+            'fire': '#FF4500',
+            'water': '#1E90FF',
+            'wind': '#98FB98',
+            'earth': '#8B4513',
+            'lightning': '#FFD700',
+            'illusion': '#9370DB',
+            'yin': '#2F4F4F',
+            'yang': '#F5F5F5',
+            'yin-yang': '#808080',
+            'other': '#A9A9A9'
+        };
+        
+        const typeColors = {
+            'offensive': '#FF6347',
+            'defensive': '#4682B4',
+            'support': '#32CD32',
+            'supplementary': '#BA55D3'
+        };
+        
+        const rankColors = ['#C0C0C0', '#CD7F32', '#FFD700', '#00BFFF', '#FF4500', '#9400D3', '#8B0000'];
+        
+        // Gráfico de elementos
+        const elementsCtx = document.getElementById('elementsChart').getContext('2d');
+        const elementsChart = new Chart(elementsCtx, {
+            type: 'pie',
+            data: {
+                labels: [
+                    {% for label in elements_labels %}
+                        '{{ label|capfirst }}',
+                    {% endfor %}
+                ],
+                datasets: [{
+                    data: [
+                        {% for value in elements_data %}
+                            {{ value }},
+                        {% endfor %}
+                    ],
+                    backgroundColor: [
+                        {% for label in elements_labels %}
+                            elementColors['{{ label }}'] || '#A9A9A9',
+                        {% endfor %}
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    }
+                }
+            }
+        });
+        
+        // Gráfico de tipos
+        const typesCtx = document.getElementById('typesChart').getContext('2d');
+        const typesChart = new Chart(typesCtx, {
+            type: 'doughnut',
+            data: {
+                labels: [
+                    {% for label in types_labels %}
+                        '{{ label|capfirst }}',
+                    {% endfor %}
+                ],
+                datasets: [{
+                    data: [
+                        {% for value in types_data %}
+                            {{ value }},
+                        {% endfor %}
+                    ],
+                    backgroundColor: [
+                        {% for label in types_labels %}
+                            typeColors['{{ label }}'] || '#A9A9A9',
+                        {% endfor %}
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                    }
+                }
+            }
+        });
+        
+        // Gráfico de ranks
+        const ranksCtx = document.getElementById('ranksChart').getContext('2d');
+        const ranksChart = new Chart(ranksCtx, {
+            type: 'bar',
+            data: {
+                labels: [
+                    {% for label in ranks_labels %}
+                        'Rank {{ label }}',
+                    {% endfor %}
+                ],
+                datasets: [{
+                    label: 'Quantidade de Jutsus',
+                    data: [
+                        {% for value in ranks_data %}
+                            {{ value }},
+                        {% endfor %}
+                    ],
+                    backgroundColor: rankColors
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+{% endblock %}
